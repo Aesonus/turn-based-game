@@ -34,11 +34,18 @@ interface TurnInterface
     public function currentAction(): ?ActionInterface;
     
     /**
+     * MUST return pop the next action without resolving it.
+     * @return ActionInterface|null MUST return null if there is no next action
+     */
+    public function popAction(): ?ActionInterface;
+    
+    /**
      * MUST Attempt to resolve the next action on the stack and pop it if exception
      * is not thrown.
      * @throws GameException SHOULD be thrown for game events only.
+     * @return ActionInterface MUST return the action that was resolved.
      */
-    public function resolveNextAction();
+    public function resolveNextAction(): ActionInterface;
     
     /**
      * MUST return array of actions taken by the given player in the order taken
