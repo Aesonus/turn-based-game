@@ -35,7 +35,7 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->getPropertyValue($this->testObj, 'player');
         $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -46,7 +46,7 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj->player();
         $this->assertSame($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -55,7 +55,7 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj->player();
         $this->assertNull($actual);
     }
-    
+
     /**
      * @test
      */
@@ -66,21 +66,21 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->actionStack->pop();
         $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */
     public function currentActionReturnsTheNextActionOnTheActionStack()
     {
         $expected = $this->newMockAction();
-        
+
         $this->actionStack->push($this->newMockAction());
         $this->actionStack->push($expected);
-                
+
         $actual = $this->testObj->currentAction();
         $this->assertSame($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -89,12 +89,12 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         $expected_count = 2;
         $this->actionStack->push($this->newMockAction());
         $this->actionStack->push($this->newMockAction());
-        
+
         //SUT
         $this->testObj->currentAction();
         $this->assertCount($expected_count, $this->actionStack);
     }
-    
+
     /**
      * @test
      */
@@ -102,12 +102,12 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
     {
         $action = $this->newMockAction();
         $this->actionStack->push($action);
-        
+
         $action->expects($this->never())->method('resolve');
         //SUT
         $this->testObj->currentAction();
     }
-    
+
     /**
      * @test
      */
@@ -115,21 +115,21 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
     {
         $this->assertNull($this->testObj->currentAction());
     }
-    
+
     /**
      * @test
      */
     public function popActionReturnsTheNextActionOnTheActionStack()
     {
         $expected = $this->newMockAction();
-        
+
         $this->actionStack->push($this->newMockAction());
         $this->actionStack->push($expected);
-                
+
         $actual = $this->testObj->popAction();
         $this->assertSame($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -138,12 +138,12 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         $expected_count = 1;
         $this->actionStack->push($this->newMockAction());
         $this->actionStack->push($this->newMockAction());
-        
+
         //SUT
         $this->testObj->popAction();
         $this->assertCount($expected_count, $this->actionStack);
     }
-    
+
     /**
      * @test
      */
@@ -151,7 +151,7 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
     {
         $this->assertNull($this->testObj->popAction());
     }
-    
+
     /**
      * @test
      */
@@ -159,12 +159,12 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
     {
         $action = $this->newMockAction();
         $this->actionStack->push($action);
-        
+
         $action->expects($this->never())->method('resolve');
         //SUT
         $this->testObj->popAction();
     }
-    
+
     /**
      * @test
      */
@@ -174,7 +174,23 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         $action->expects($this->once())->method('resolve');
         $this->testObj->resolveNextAction();
     }
-    
+
+    /**
+     * @test
+     */
+    public function resolveNextActionReturnsResolvedAction()
+    {
+        $action = $this->setupActionStack();
+        //When implementing this method, it must return a cloned version
+        //of itself with isResolved() returning true
+        $action->expects($this->once())->method('resolve')
+            ->willReturnCallback(function () use ($action) {
+                $this->setPropertyValue($action, 'resolved', true);
+                return clone $action;
+            });
+        $this->assertTrue($this->testObj->resolveNextAction()->isResolved());
+    }
+
     /**
      * @test
      */
@@ -185,40 +201,40 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         $this->testObj->resolveNextAction();
         $this->assertCount($expected_count, $this->actionStack);
     }
-    
+
     /**
      * @test
      */
     public function resolveNextActionDoesNotPopActionOffOfTheActionStackIfExceptionThrown()
     {
         $action = $this->setupActionStack();
-        
+
         // Use this exception because it isn't abstract
         $action->expects($this->once())->method('resolve')
             ->willThrowException(new CounterActionException());
         $this->expectException(CounterActionException::class);
-        
+
         $expected_count = 2;
         $this->testObj->resolveNextAction();
         $this->assertCount($expected_count, $this->actionStack);
     }
-    
+
     /**
      * @test
      */
     public function resolveNextActionKeepsTheSameActionOnTheActionStackIfExceptionThrown()
     {
         $action = $this->setupActionStack();
-        
+
         // Use this exception because it isn't abstract
         $action->expects($this->once())->method('resolve')
             ->willThrowException(new CounterActionException());
         $this->expectException(CounterActionException::class);
-        
+
         $this->testObj->resolveNextAction();
         $this->assertSame($action, $this->actionStack[0]);
     }
-    
+
     /**
      * @test
      */
@@ -226,7 +242,7 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
     {
         $this->assertNull($this->testObj->resolveNextAction());
     }
-    
+
     protected function setupActionStack()
     {
         $first_action = $this->newMockAction();
