@@ -11,7 +11,7 @@ interface PlayerInterface
 {
     
     /**
-     * MUST return the unique name of the character
+     * MUST return the name of the character
      */
     public function __toString();
     
@@ -23,8 +23,8 @@ interface PlayerInterface
     public function canTakeCounterAction(ActionInterface $action): ?bool;
     
     /**
-     * MUST return a new action interface
-     * @return \Aesonus\TurnGame\Contracts\ActionInterface
+     * MUST return a new action interface belonging to this player
+     * @return ActionInterface
      */
     public function newAction(): ActionInterface;
     
@@ -33,11 +33,24 @@ interface PlayerInterface
      * @param float $initiative
      * @return void
      */
-    public function initiative(float $initiative): void;
+    public function setInitiative(float $initiative): void;
     
     /**
-     * MUST return the initiative of the player.
+     * MUST return the initiative of the player or null if it isn't set
      * @return float
      */
-    public function getInitiative(): float;
+    public function initiative(): ?float;
+    
+    /**
+     * MUST set the player's name
+     * @param string $name
+     * @return void
+     */
+    public function setName(string $name): void;
+    
+    /**
+     * MUST return the name of the player or null if it isn't set
+     * @return string|null
+     */
+    public function name(): ?string;
 }

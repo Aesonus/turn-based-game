@@ -12,7 +12,7 @@ use Aesonus\TurnGame\Exceptions\{
  * MUST serialize and deserialize to json
  * @author Aesonus <corylcomposinger at gmail.com>
  */
-interface ActionInterface extends \Serializable
+interface ActionInterface
 {
 
     /**
@@ -25,8 +25,9 @@ interface ActionInterface extends \Serializable
     
     /**
      * MUST return the player taking this action.
+     * @return PlayerInterface|null MUST return null if not set
      */
-    public function player(): PlayerInterface;
+    public function player(): ?PlayerInterface;
     
     /**
      * MUST set the target(s) of this action. An action MUST exclusively target 
@@ -57,10 +58,10 @@ interface ActionInterface extends \Serializable
     public function modifies(ActionInterface $action): ActionInterface;
     
     /**
-     * MUST return array of modified action or null if no targets are set.
-     * @return array|null
+     * MUST return the modified action or null if no action is set.
+     * @return ActionInterface|null
      */
-    public function getModifiedAction(): ?array;
+    public function getModifiedAction(): ?ActionInterface;
     
     /**
      * MUST attempt to resolve this action against the targets or the modified action.
@@ -83,9 +84,9 @@ interface ActionInterface extends \Serializable
     /**
      * MUST set the type of the action. Can be as simple as setting
      * a property on this ActionInterface to returning a different child of 
-     * ActionInterface altogether
+     * ActionInterface altogether.
      * @param mixed $action_type
-     * @return ActionInterface
+     * @return ActionInterface MUST return a new ActionInterface
      */
     public function setType($action_type): ActionInterface;
     

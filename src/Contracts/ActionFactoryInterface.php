@@ -9,7 +9,7 @@ namespace Aesonus\TurnGame\Contracts;
 interface ActionFactoryInterface
 {
     /**
-     * MUST return a new action parsed from string representation
+     * MUST return a new action created from string representation
      * @param string $action
      * @return ActionInterface
      */

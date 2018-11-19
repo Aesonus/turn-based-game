@@ -11,9 +11,9 @@ interface TurnInterface
     /**
      * MUST set this turn's player to $player. MUST return $this
      * @param PlayerInterface $player
-     * @return $this
+     * @return void
      */
-    public function setPlayer(PlayerInterface $player): self;
+    public function setPlayer(PlayerInterface $player): void;
     
     /**
      * MUST get the attached player or null if none are attached
@@ -23,12 +23,12 @@ interface TurnInterface
     
     /**
      * MUST push the ActionInterface onto the action stack for this turn
-     * @return $this MUST be fluent
+     * @return void 
      */
-    public function pushAction(ActionInterface $action);
+    public function pushAction(ActionInterface $action): void;
     
     /**
-     * MUST return the next action without popping it or resolving it.
+     * MUST return the next action in the stack without popping it or resolving it.
      * @return ActionInterface|null MUST return null if there is no next action
      */
     public function currentAction(): ?ActionInterface;
@@ -43,23 +43,8 @@ interface TurnInterface
      * MUST Attempt to resolve the next action on the stack and pop it if exception
      * is not thrown.
      * @throws GameException SHOULD be thrown for game events only.
-     * @return ActionInterface MUST return the action that was resolved.
+     * @return ActionInterface|null MUST return the action that was resolved or null
+     * if no actions on stack
      */
-    public function resolveNextAction(): ActionInterface;
-    
-    /**
-     * MUST return array of actions taken by the given player in the order taken
-     * @param PlayerInterface $player
-     */
-    public function actionsTakenBy(PlayerInterface $player);
-
-    /**
-     * MUST return the last $offset action(s)
-     * @deprecated since version 0
-     * @param int $offset $offset of 1 SHOULD be the current action
-     * @throws \InvalidArgumentException MUST be thrown if $offset is less than 1
-     * @return ActionInterface|null MUST return the ActionInterface or 
-     * null if none exist at offset
-     */
-    public function findAction($offset): ?ActionInterface;
+    public function resolveNextAction(): ?ActionInterface;
 }

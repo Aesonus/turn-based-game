@@ -30,8 +30,8 @@ interface GameInterface
     
     /**
      * MUST create a new turn. MUST set the player for the turn to the next 
-     * player in the list and wrap around to the top of the list when the end is 
-     * reached.
+     * player in the list after the current turn's player and wrap around to the
+     * top of the list when the end is reached.
      * @return TurnInterface
      */
     public function newTurn(): TurnInterface;
