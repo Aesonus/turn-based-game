@@ -96,5 +96,5 @@ interface ActionInterface
      * MUST return an associative array representation of the action
      * @return array
      */
-    abstract public function toArray(): array;
+    public function toArray(): array;
 }
