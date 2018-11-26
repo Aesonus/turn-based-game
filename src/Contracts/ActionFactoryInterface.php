@@ -16,8 +16,9 @@ interface ActionFactoryInterface
     public function fromString(string $action): ActionInterface;
     
     /**
-     * MUST return a new action
+     * MUST return a new action of type given or a default type
+     * @param string|null [optional] $of_type
      * @return ActionInterface
      */
-    public function newAction(): ActionInterface;
+    public function newAction(?string $of_type = null): ActionInterface;
 }

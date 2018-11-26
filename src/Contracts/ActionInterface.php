@@ -35,8 +35,6 @@ interface ActionInterface
      * @param PlayerInterface[]|PlayerInterface $targets MUST accept a PlayerInterface
      * or an array of PlayerInterfaces.
      * @return ActionInterface MUST return a new ActionInterface
-     * @throws InvalidActionException MUST be thrown when the action already
-     * has modifications
      * @throws \InvalidArgumentException MUST be thrown when $targets parameter is
      * not a PlayerInterface or an array of PlayerInterfaces
      */
@@ -51,8 +49,6 @@ interface ActionInterface
     /**
      * MUST set which action is modified by this action.
      * @param ActionInterface $action MUST accept an ActionInterface
-     * @throws InvalidActionException MUST be thrown when the action already
-     * has targeted players
      * @return ActionInterface MUST return a new ActionInterface
      */
     public function modifies(ActionInterface $action): ActionInterface;
@@ -84,7 +80,7 @@ interface ActionInterface
     /**
      * MUST set the type of the action. Can be as simple as setting
      * a property on this ActionInterface to returning a different child of 
-     * ActionInterface altogether.
+     * ActionInterface altogether. SHOULD keep all information about the action.
      * @param mixed $action_type
      * @return ActionInterface MUST return a new ActionInterface
      */
@@ -95,4 +91,10 @@ interface ActionInterface
      * @return mixed
      */
     public function getType();
+    
+    /**
+     * MUST return an associative array representation of the action
+     * @return array
+     */
+    abstract public function toArray(): array;
 }

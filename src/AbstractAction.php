@@ -14,14 +14,8 @@ use Aesonus\TurnGame\Contracts\{
  *
  * @author Aesonus <corylcomposinger at gmail.com>
  */
-abstract class AbstractAction implements Contracts\ActionInterface
-{
-    /**
-     * 
-     * @var ActionStorageInterface
-     */
-    protected $storage;
-    
+abstract class AbstractAction implements Contracts\ActionInterface, \ArrayAccess
+{    
     /**
      *
      * @var ActionInterface
@@ -51,12 +45,9 @@ abstract class AbstractAction implements Contracts\ActionInterface
      * @var bool 
      */
     protected $resolved = false;
-
+    
     public function modifies(ActionInterface $action): ActionInterface
     {
-        if ($this->getTargets() !== null) {
-            throw new InvalidActionException();
-        }
         $this->modified_action = $action;
         return clone $this;
     }
@@ -68,9 +59,6 @@ abstract class AbstractAction implements Contracts\ActionInterface
 
     public function targets($targets): ActionInterface
     {
-        if ($this->getModifiedAction() !== null) {
-            throw new InvalidActionException();
-        }
         $targets = is_array($targets) ? $targets : [$targets];
         array_map(function ($target) {
             if (!$target instanceof PlayerInterface) {

@@ -2,9 +2,10 @@
 
 namespace Aesonus\Tests;
 
-use Aesonus\TurnGame\AbstractAction;
-use Aesonus\TurnGame\Contracts\PlayerInterface;
-use Aesonus\TurnGame\Exceptions\InvalidActionException;
+use Aesonus\TurnGame\{
+    AbstractAction,
+    Contracts\PlayerInterface
+};
 
 /**
  * Tests the Base Action class
@@ -45,7 +46,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
             ->getPropertyValue($newAction, 'player');
         $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -56,7 +57,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj->player();
         $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -64,7 +65,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
     {
         $this->assertNull($this->testObj->player());
     }
-    
+
     /**
      * @test
      */
@@ -74,7 +75,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj->setType('test');
         $this->assertNotSame($expected, $actual);
     }
-    
+
     /**
      * @test
      * @dataProvider setTypeSetsTheTypePropertyDataProvider
@@ -98,7 +99,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
             [23]
         ];
     }
-    
+
     /**
      * @test
      */
@@ -109,7 +110,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj->getType();
         $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      * @dataProvider isResolvedReturnsResolvedPropertyDataProvider
@@ -131,7 +132,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
             [false]
         ];
     }
-    
+
     /**
      * @test
      */
@@ -139,7 +140,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
     {
         $this->assertFalse($this->testObj->isResolved());
     }
-    
+
     /**
      * @test
      */
@@ -150,7 +151,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->getPropertyValue($newAction, 'modified_action');
         $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -160,17 +161,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj->modifies($this->newMockAction());
         $this->assertNotSame($expected, $actual);
     }
-    
-    /**
-     * @test
-     */
-    public function modifiesThrowsInvalidActionExceptionIfTargetsAlreadySet()
-    {
-        $this->expectException(InvalidActionException::class);
-        $newAction = $this->testObj->targets($this->newMockPlayer());
-        $newAction->modifies($this->newMockAction());
-    }
-    
+
     /**
      * @test
      */
@@ -181,7 +172,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj->getModifiedAction();
         $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -189,7 +180,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
     {
         $this->assertNull($this->testObj->getModifiedAction());
     }
-    
+
     /**
      * @test
      */
@@ -199,7 +190,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj->targets($this->newMockPlayer());
         $this->assertNotSame($expected, $actual);
     }
-    
+
     /**
      * @test
      * @dataProvider targetsSetsTheTargetPropertyToArrayOfPlayersDataProvider
@@ -208,7 +199,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
     {
         $newAction = $this->testObj->targets($expected);
         //Make the expected value always an array
-        $expected = is_array($expected)? $expected : [$expected];
+        $expected = is_array($expected) ? $expected : [$expected];
         $actual = $this->getPropertyValue($newAction, 'targets');
         $this->assertEquals($expected, $actual);
     }
@@ -223,7 +214,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
             'array' => [[$this->newMockPlayer(), $this->newMockPlayer()]]
         ];
     }
-    
+
     /**
      * @test
      * @dataProvider invalidTargetsDataProvider
@@ -246,17 +237,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
             [[new \stdClass()]]
         ];
     }
-    
-    /**
-     * @test
-     */
-    public function targetsThrownInvalidActionExceptionIfGetModifiedActionAlreadySet()
-    {
-        $this->expectException(InvalidActionException::class);
-        $newAction = $this->testObj->modifies($this->newMockAction());
-        $newAction->targets($this->newMockPlayer());
-    }
-    
+
     /**
      * @test
      */
@@ -267,7 +248,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj->getTargets();
         $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -275,12 +256,12 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
     {
         $this->assertNull($this->testObj->getModifiedAction());
     }
-    
+
     protected function newMockAction()
     {
         return $this->getMockForAbstractClass(AbstractAction::class);
     }
-    
+
     protected function newMockPlayer(): \PHPUnit_Framework_MockObject_MockObject
     {
         return $this->getMockForAbstractClass(PlayerInterface::class);
