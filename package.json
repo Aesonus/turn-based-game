@@ -1,0 +1,26 @@
+{
+  "name": "turn-based-game",
+  "version": "1.0.0",
+  "description": "Turn Based Game",
+  "main": "gulpfile.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "gulp": "^4.0.0"},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://Aesonus@github.com/Aesonus/turn-based-game.git"
+  },
+  "author": "Cory Laughlin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Aesonus/turn-based-game/issues"
+  },
+  "homepage": "https://github.com/Aesonus/turn-based-game#readme"
+}

@@ -1,5 +1,7 @@
 /vendor/
 /nbproject/
+/node_modules/
+package-lock.json
 /composer.lock
 /.vagrant/
 /ubuntu-xenial-16.04-cloudimg-console.log
