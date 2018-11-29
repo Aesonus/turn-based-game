@@ -10,29 +10,36 @@
 
 namespace Aesonus\TurnGame\Exceptions;
 
-use Aesonus\TurnGame\Contracts\{
-    PlayerInterface,
-    ActionInterface
-};
+use Aesonus\TurnGame\Contracts\ActionInterface;
 
 /**
- * 
+ * Used to trigger a response to an action
  * @author Aesonus <corylcomposinger at gmail.com>
  */
 class CounterActionException extends GameException
 {
     /**
-     * Sets the action this exception is in response to
+     *
+     * @var ActionInterfacce
+     */
+    protected $action;
+    
+    /**
+     * Sets the action this event is in response to
      * @param ActionInterface $action
      * @return void
      */
     public function setAction(ActionInterface $action): void
     {
-        
+        $this->action = $action;
     }
     
-    public function getAction(): ActionInterface
+    /**
+     * Gets the action this event is in response to
+     * @return ActionInterface|null
+     */
+    public function getAction(): ?ActionInterface
     {
-        
+        return $this->action;
     }
 }
