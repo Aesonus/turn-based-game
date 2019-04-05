@@ -2,57 +2,71 @@
 
 namespace Aesonus\TurnGame;
 
-use Aesonus\TurnGame\Exceptions\InvalidActionException;
-use Aesonus\TurnGame\Contracts\{
-    ActionInterface,
-    PlayerInterface,
-    ActionStorageInterface
-};
+use Aesonus\PhpMagic\HasMagicProperties;
+use Aesonus\TurnGame\Contracts\ActionInterface;
+use Aesonus\TurnGame\Contracts\PlayerInterface;
+use ArrayAccess;
+use InvalidArgumentException;
+use Iterator;
 
 /**
  * Base class for actions
  *
  * @author Aesonus <corylcomposinger at gmail.com>
  */
-abstract class AbstractAction implements Contracts\ActionInterface, \ArrayAccess
-{    
+abstract class AbstractAction implements ActionInterface, ArrayAccess, Iterator
+{
+    use HasMagicProperties;
+    use \Aesonus\PhpMagic\ImplementsMagicMethods;
     /**
      *
      * @var ActionInterface
      */
     protected $modified_action;
-    
+
     /**
      *
-     * @var array
+     * @var PlayerInterface[]
      */
     protected $targets;
-    
+
     /**
      *
-     * @var PlayerInterface 
+     * @var PlayerInterface
      */
     protected $player;
-    
+
     /**
      * The type of this action
-     * @var mixed 
+     * @var mixed
      */
     protected $type;
-    
+
     /**
      *
-     * @var bool 
+     * @var bool
      */
     protected $resolved = false;
-    
+
+    /**
+     *
+     * @var Effects[]
+     */
+    protected $effects = [];
+
+    /**
+     *
+     * @var int
+     */
+    protected $current_effect = 0;
+
     public function modifies(ActionInterface $action): ActionInterface
     {
         $this->modified_action = $action;
         return clone $this;
     }
-    
-    public function getModifiedAction(): ?ActionInterface
+
+    public function getModifiedAction(): ? ActionInterface
     {
         return $this->modified_action;
     }
@@ -62,11 +76,11 @@ abstract class AbstractAction implements Contracts\ActionInterface, \ArrayAccess
         $targets = is_array($targets) ? $targets : [$targets];
         array_map(function ($target) {
             if (!$target instanceof PlayerInterface) {
-                throw new \InvalidArgumentException();
+                throw new InvalidArgumentException();
             }
         }, $targets);
         $this->targets = $targets;
-        
+
         return clone $this;
     }
 
@@ -97,8 +111,64 @@ abstract class AbstractAction implements Contracts\ActionInterface, \ArrayAccess
         return $this->type;
     }
 
+    public function setIsResolved(bool $resolved): ActionInterface
+    {
+        $this->resolved = $resolved;
+        return clone $this;
+    }
+
     public function isResolved(): bool
     {
         return $this->resolved;
+    }
+
+    ///Array Access Methods
+    public function offsetExists($offset): bool
+    {
+        return (isset($this->effects[$offset]));
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->effects[$offset];
+    }
+
+    public function offsetSet($offset, $value): void
+    {
+        if ($offset === null) {
+            $offset = count($this->effects);
+        }
+        $this->effects[$offset] = $value;
+    }
+
+    public function offsetUnset($offset): void
+    {
+        unset($this->effects[$offset]);
+    }
+
+    ///Iterator Methods
+    public function current()
+    {
+        return $this[$this->current_effect];
+    }
+
+    public function key()
+    {
+        return $this->current_effect;
+    }
+
+    public function next(): void
+    {
+        $this->current_effect ++;
+    }
+
+    public function rewind(): void
+    {
+        $this->current_effect = 0;
+    }
+
+    public function valid(): bool
+    {
+        return isset($this[$this->current_effect]);
     }
 }

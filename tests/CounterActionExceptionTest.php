@@ -2,10 +2,8 @@
 
 namespace Aesonus\Tests;
 
-use Aesonus\TurnGame\{
-    Exceptions\CounterActionException,
-    Contracts\ActionInterface
-};
+use Aesonus\TurnGame\Exceptions\CounterActionException;
+use Aesonus\TurnGame\Contracts\ActionInterface;
 
 /**
  * Tests the CounterActionException class
@@ -14,11 +12,10 @@ use Aesonus\TurnGame\{
  */
 class CounterActionExceptionTest extends \Aesonus\TestLib\BaseTestCase
 {
-    
     public $testObj;
     public $expectedAction;
-    
-    protected function setUp()
+
+    protected function setUp(): void
     {
         $this->expectedAction = $this->getMockForAbstractClass(ActionInterface::class);
         try {
@@ -29,31 +26,21 @@ class CounterActionExceptionTest extends \Aesonus\TestLib\BaseTestCase
 
         parent::setUp();
     }
-    
+
     /**
      * @test
      */
-    public function setActionSetsTheActionProperty()
+    public function getActionGetsTheSetAction()
     {
         $this->testObj->setAction($this->expectedAction);
-        $actual = $this->getPropertyValue($this->testObj, 'action');
-        $this->assertSame($this->expectedAction, $actual);
-    }
-    
-    /**
-     * @test
-     */
-    public function getActionGetsTheActionProperty()
-    {
-        $this->setPropertyValue($this->testObj, 'action', $this->expectedAction);
         $actual = $this->testObj->getAction();
         $this->assertSame($this->expectedAction, $actual);
     }
-    
+
     /**
      * @test
      */
-    public function getActionReturnsNullIfActionPropertyNotSet()
+    public function getActionReturnsNullIfActionNotSet()
     {
         $this->assertNull($this->testObj->getAction());
     }

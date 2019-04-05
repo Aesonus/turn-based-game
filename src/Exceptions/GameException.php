@@ -34,4 +34,5 @@ abstract class GameException extends \RuntimeException
     {
         return $this->player;
     }
+    
 }

@@ -2,20 +2,31 @@
 
 namespace Aesonus\Tests;
 
+use Aesonus\TestLib\BaseTestCase;
 use Aesonus\TurnGame\AbstractPlayer;
 use Aesonus\TurnGame\Contracts\ActionFactoryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the base Player class
  *
  * @author Aesonus <corylcomposinger at gmail.com>
  */
-class AbstractPlayerTest extends \Aesonus\TestLib\BaseTestCase
+class AbstractPlayerTest extends BaseTestCase
 {
+    /**
+     *
+     * @var AbstractPlayer|MockObject
+     */
     public $testObj;
+
+    /**
+     *
+     * @var ActionFactoryInterface|MockObject
+     */
     public $mockActionFactory;
-    
-    protected function setUp()
+
+    protected function setUp(): void
     {
         $this->mockActionFactory = $this
             ->getMockForAbstractClass(ActionFactoryInterface::class);
@@ -24,59 +35,43 @@ class AbstractPlayerTest extends \Aesonus\TestLib\BaseTestCase
             ->getMockForAbstractClass();
         parent::setUp();
     }
-    
+
     /**
      * @test
      */
-    public function setInitiativeSetsTheInitiativeProperty()
+    public function initiativeGetsTheSetInitiativeValue()
     {
         $expected = 23.4;
         $this->testObj->setInitiative($expected);
-        $actual = $this->getPropertyValue($this->testObj, 'initiative');
-        $this->assertEquals($expected, $actual);
-    }
-    
-    /**
-     * @test
-     */
-    public function setNameSetsTheNameProperty()
-    {
-        $expected = 'Name';
-        $this->testObj->setName($expected);
-        $actual = $this->getPropertyValue($this->testObj, 'name');
-        $this->assertEquals($expected, $actual);
-    }
-    
-    /**
-     * @test
-     */
-    public function initiativeGetsTheInitiativeProperty()
-    {
-        $expected = 23.4;
-        $this->setPropertyValue($this->testObj, 'initiative', $expected);
         $actual = $this->testObj->initiative();
         $this->assertEquals($expected, $actual);
+        $actual = $this->testObj->initiative;
+        $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */
     public function initiativeReturnNullIfNotSet()
     {
         $this->assertNull($this->testObj->initiative());
+        $this->assertNull($this->testObj->initiative);
+        $this->assertFalse(isset($this->testObj->initiative));
     }
-    
+
     /**
      * @test
      */
-    public function nameGetsTheNameProperty()
+    public function nameGetsTheSetName()
     {
         $expected = "testname";
-        $this->setPropertyValue($this->testObj, 'name', $expected);
+        $this->testObj->setName($expected);
         $actual = $this->testObj->name();
         $this->assertEquals($expected, $actual);
+        $actual = $this->testObj->name;
+        $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */
@@ -84,18 +79,18 @@ class AbstractPlayerTest extends \Aesonus\TestLib\BaseTestCase
     {
         $this->assertNull($this->testObj->name());
     }
-    
+
     /**
      * @test
      */
-    public function __toStringReturnsNameProperty()
+    public function __toStringReturnsTheSetNameValue()
     {
         $expected = "testname";
-        $this->setPropertyValue($this->testObj, 'name', $expected);
+        $this->testObj->setName($expected);
         $actual = (string)$this->testObj;
         $this->assertEquals($expected, $actual);
     }
-    
+
     /**
      * @test
      */

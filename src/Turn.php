@@ -2,11 +2,9 @@
 
 namespace Aesonus\TurnGame;
 
-use Aesonus\TurnGame\Contracts\{
-    PlayerInterface,
-    ActionInterface,
-    TurnInterface
-};
+use Aesonus\TurnGame\Contracts\PlayerInterface;
+use Aesonus\TurnGame\Contracts\ActionInterface;
+use Aesonus\TurnGame\Contracts\TurnInterface;
 
 /**
  * Base turn class

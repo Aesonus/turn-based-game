@@ -2,10 +2,8 @@
 
 namespace Aesonus\Tests;
 
-use Aesonus\TurnGame\{
-    Exceptions\GameException,
-    Contracts\PlayerInterface
-};
+use Aesonus\TurnGame\Exceptions\GameException;
+use Aesonus\TurnGame\Contracts\PlayerInterface;
 
 /**
  * Tests the game exception
@@ -14,15 +12,13 @@ use Aesonus\TurnGame\{
  */
 class GameExceptionTest extends \Aesonus\TestLib\BaseTestCase
 {
-
     public $testObj;
     public $expectedPlayer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         try {
             throw new class extends GameException {
-                
             };
         } catch (GameException $exc) {
             $this->testObj = $exc;
@@ -34,19 +30,9 @@ class GameExceptionTest extends \Aesonus\TestLib\BaseTestCase
     /**
      * @test
      */
-    public function setPlayerSetsThePlayerProperty()
+    public function getPlayerGetsTheSetPlayer()
     {
         $this->testObj->setPlayer($this->expectedPlayer);
-        $actual = $this->getPropertyValue($this->testObj, 'player');
-        $this->assertSame($this->expectedPlayer, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function getPlayerGetsThePlayerProperty()
-    {
-        $this->setPropertyValue($this->testObj, 'player', $this->expectedPlayer);
         $actual = $this->testObj->getPlayer();
         $this->assertSame($this->expectedPlayer, $actual);
     }

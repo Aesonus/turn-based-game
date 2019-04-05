@@ -2,32 +2,36 @@
 
 namespace Aesonus\Tests;
 
-use Aesonus\TurnGame\{
-    AbstractPlayer,
-    Game,
-    AbstractAction
-};
-use Aesonus\TurnGame\Contracts\{
-    TurnFactoryInterface,
-    ActionFactoryInterface,
-    PlayerInterface,
-    TurnInterface
-};
+use Aesonus\TestLib\BaseTestCase;
+use Aesonus\TurnGame\AbstractAction;
+use Aesonus\TurnGame\AbstractPlayer;
+use Aesonus\TurnGame\Contracts\ActionFactoryInterface;
+use Aesonus\TurnGame\Contracts\PlayerInterface;
+use Aesonus\TurnGame\Contracts\TurnFactoryInterface;
+use Aesonus\TurnGame\Contracts\TurnInterface;
+use Aesonus\TurnGame\Game;
+use Aesonus\TurnGame\Turn;
+use PHPUnit\Framework\MockObject\MockObject;
+use SplStack;
 
 /**
  * Tests the game class
  *
  * @author Aesonus <corylcomposinger at gmail.com>
  */
-class GameTest extends \Aesonus\TestLib\BaseTestCase
+class GameTest extends BaseTestCase
 {
 
+    /**
+     *
+     * @var Game
+     */
     public $testObj;
     public $playerQueue;
     public $mockTurnFactory;
     public $mockActionFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mockTurnFactory = $this
             ->getMockForAbstractClass(TurnFactoryInterface::class);
@@ -47,7 +51,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
     )
     {
         $this->testObj->setPlayers($expected_players);
-        $playerQueue = $this->getPropertyValue($this->testObj, 'players');
+        $playerQueue = $this->testObj->findPlayers();
         $this->assertCount(count($expected_players), $playerQueue);
 
         foreach ($playerQueue as $i => $actual) {
@@ -61,7 +65,13 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
     public function setPlayersDataProvider()
     {
         return [
-            [[$this->newMockPlayer(null, 1)], [1]],
+            [
+                [
+                    $this->newMockPlayer(null, 1)
+                ], [
+                    1
+                ]
+            ],
             [
                 [
                     $this->newMockPlayer(null, 1),
@@ -102,7 +112,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
         $actual_names = array_map(function ($value) {
             return $value->name();
         }, $actual);
-        $this->assertArraySubset($find, $actual_names);
+        $this->assertArrayContainsValues($find, $actual_names);
     }
 
     /**
@@ -125,6 +135,21 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
     /**
      * @test
      */
+    public function findPlayersGetsAllPlayersInOrder()
+    {
+        $expected = [
+            $this->newMockPlayer('Bob'),
+            $this->newMockPlayer('Bill'),
+            $this->newMockPlayer('Beau'),
+        ];
+        $this->testObj->setPlayers($expected);
+        $actual = $this->testObj->findPlayers();
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @test
+     */
     public function findPlayersReturnsNullIfNoPlayersAreInGame()
     {
         $this->assertNull($this->testObj->findPlayers(['test']));
@@ -134,15 +159,15 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
      * @test
      * @dataProvider alreadyPresentTurnsDataProvider
      */
-    public function setCurrentTurnPrependsTurnOntoTurnsProperty($already_present_turns)
+    public function setCurrentTurnPushesTheCurrentTurn($already_present_turns)
     {
         $expected = $this->newTurn();
         //Put some dummy turns in
-        $this->setPropertyValue($this->testObj, 'turns', $already_present_turns);
+        array_map([$this->testObj, 'setCurrentTurn'], $already_present_turns);
 
         $this->testObj->setCurrentTurn($expected);
-        $actual = $this->getPropertyValue($this->testObj, 'turns');
-        $this->assertEquals($expected, $actual[0]);
+        $actual = $this->testObj->currentTurn();
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -151,7 +176,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
     public function alreadyPresentTurnsDataProvider()
     {
         return [
-            [null],
+            [[]],
             [[$this->newTurn()]],
             [[$this->newTurn(), $this->newTurn()]]
         ];
@@ -160,11 +185,11 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
     /**
      * @test
      */
-    public function currentTurnGetsTheFirstElementInTurnsProperty()
+    public function currentTurnGetsTheLatestPushedTurn()
     {
         $expected = $this->newTurn();
-        $this->setPropertyValue($this->testObj, 'turns', [$expected, $this->newTurn()]);
-
+        $this->testObj->setCurrentTurn($this->newTurn());
+        $this->testObj->setCurrentTurn($expected);
         $actual = $this->testObj->currentTurn();
 
         $this->assertSame($expected, $actual);
@@ -184,7 +209,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
      */
     public function findTurnReturnsTurnAtIndex($turns, $index, $expected)
     {
-        $this->setPropertyValue($this->testObj, 'turns', $turns);
+        array_map([$this->testObj, 'setCurrentTurn'], $turns);
         $actual = $this->testObj->findTurn($index);
         $this->assertSame($expected, $actual);
     }
@@ -202,7 +227,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
                     $this->newTurn(),
                     $expected,
                 ],
-                2,
+                0,
                 $expected
             ],
             [
@@ -211,7 +236,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
                     $this->newTurn(),
                     $this->newTurn(),
                 ],
-                0,
+                2,
                 $expected
             ]
         ];
@@ -222,13 +247,12 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
      */
     public function findTurnReturnsCurrentTurnAtIndex0()
     {
-
         $turns = [
             $this->newTurn(),
             $this->newTurn(),
             $this->newTurn(),
         ];
-        $this->setPropertyValue($this->testObj, 'turns', $turns);
+        array_map([$this->testObj, 'setCurrentTurn'], $turns);
 
         $expected = $this->testObj->currentTurn();
         $actual = $this->testObj->findTurn(0);
@@ -241,7 +265,8 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
      */
     public function findTurnReturnsNullIfNoTurnAtIndex($turns, $index)
     {
-        $this->setPropertyValue($this->testObj, 'turns', $turns);
+        array_map([$this->testObj, 'setCurrentTurn'], $turns);
+
         $this->assertNull($this->testObj->findTurn($index));
     }
 
@@ -273,6 +298,31 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
     /**
      * @test
      */
+    public function allTurnsGetsAllTurns()
+    {
+        $expected = [
+            $this->newTurn(),
+            $this->newTurn(),
+            $this->newTurn(),
+        ];
+        array_map([$this->testObj, 'setCurrentTurn'], $expected);
+
+        $actual = $this->testObj->allTurns();
+
+        $this->assertEquals(array_reverse($expected), $actual);
+    }
+
+    /**
+     * @test
+     */
+    public function allTurnsReturnsNullIfNoTurnsTaken()
+    {
+        $this->assertNull($this->testObj->allTurns());
+    }
+
+    /**
+     * @test
+     */
     public function isStartedReturnsTrueIfTurnsPropertyIsNotEmpty()
     {
         $turns = [
@@ -280,7 +330,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
             $this->newTurn(),
             $this->newTurn(),
         ];
-        $this->setPropertyValue($this->testObj, 'turns', $turns);
+        array_map([$this->testObj, 'setCurrentTurn'], $turns);
         $this->assertTrue($this->testObj->isStarted());
     }
 
@@ -299,8 +349,8 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
     public function nextPlayerReturnsTheNextPlayerInTheTurnOrder($players, $turns, $expected)
     {
         //Setup
-        $this->setPropertyValue($this->testObj, 'players', $players);
-        $this->setPropertyValue($this->testObj, 'turns', $turns);
+        $this->testObj->setPlayers($players);
+        array_map([$this->testObj, 'setCurrentTurn'], $turns);
 
         $actual = $this->testObj->nextPlayer();
         $this->assertEquals($expected, $actual);
@@ -327,8 +377,8 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
             'wrap around' => [
                 $players,
                 [
-                    $this->newTurn($players[2]),
                     $this->newTurn($players[1]),
+                    $this->newTurn($players[2]),
                 ],
                 $players[0]
             ],
@@ -346,7 +396,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
             $this->newMockPlayer('Bob', 3),
         ];
         //Setup
-        $this->setPropertyValue($this->testObj, 'players', $players);
+        $this->testObj->setPlayers($players);
 
         $expected = $players[0];
         $actual = $this->testObj->nextPlayer();
@@ -372,7 +422,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
             $this->newMockPlayer('Bob', 3),
         ];
         //Setup
-        $this->setPropertyValue($this->testObj, 'players', $players);
+        $this->testObj->setPlayers($players);
         $this->mockActionFactory->expects($this->once())->method('newAction')
             ->willReturn($this->newMockAction());
         $this->mockTurnFactory->expects($this->once())->method('newTurn')
@@ -385,7 +435,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
         $this->assertEquals($expected_player, $actual->player());
         $this->assertEquals($expected_player, $actual->currentAction()->player());
     }
-    
+
     /**
      * @test
      */
@@ -396,7 +446,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
 
     protected function newTurn(PlayerInterface $player = null)
     {
-        $turn = new \Aesonus\TurnGame\Turn(new \SplStack());
+        $turn = new Turn(new SplStack());
         if (isset($player)) {
             $turn->setPlayer($player);
         }
@@ -408,7 +458,7 @@ class GameTest extends \Aesonus\TestLib\BaseTestCase
         return $this->getMockForAbstractClass(AbstractAction::class);
     }
 
-    protected function newMockPlayer($name = null, $initiative = null): \PHPUnit_Framework_MockObject_MockObject
+    protected function newMockPlayer($name = null, $initiative = null): MockObject
     {
         /* @var $player AbstractPlayer */
         $player = $this->getMockBuilder(AbstractPlayer::class)

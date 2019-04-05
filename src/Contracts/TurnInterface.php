@@ -23,7 +23,7 @@ interface TurnInterface
     
     /**
      * MUST push the ActionInterface onto the action stack for this turn
-     * @return void 
+     * @return void
      */
     public function pushAction(ActionInterface $action): void;
     

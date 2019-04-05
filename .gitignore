@@ -1,7 +1,9 @@
 /vendor/
 /nbproject/
 /node_modules/
-package-lock.json
+package-lock.
 /composer.lock
 /.vagrant/
 /ubuntu-xenial-16.04-cloudimg-console.log
+/.php_cs.cache
+/.phpunit.result.cache

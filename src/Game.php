@@ -2,12 +2,11 @@
 
 namespace Aesonus\TurnGame;
 
-use Aesonus\TurnGame\Contracts\{
-    GameInterface,
-    TurnInterface,
-    TurnFactoryInterface,
-    ActionFactoryInterface
-};
+use Aesonus\TurnGame\Contracts\ActionFactoryInterface;
+use Aesonus\TurnGame\Contracts\GameInterface;
+use Aesonus\TurnGame\Contracts\PlayerInterface;
+use Aesonus\TurnGame\Contracts\TurnFactoryInterface;
+use Aesonus\TurnGame\Contracts\TurnInterface;
 
 /**
  * Controls top level game functionality
@@ -22,7 +21,7 @@ class Game implements GameInterface
      * @var TurnFactoryInterface
      */
     protected $turn_factory;
-    
+
     /**
      *
      * @var ActionFactoryInterface
@@ -36,7 +35,7 @@ class Game implements GameInterface
     protected $players = [];
 
     /**
-     * Contains all turns in the game with the first one being the current
+     * Contains all turns in the game with the first one (element [0]) being the current
      * @var TurnInterface[]
      */
     protected $turns;
@@ -44,13 +43,12 @@ class Game implements GameInterface
     public function __construct(
         TurnFactoryInterface $turn_factory,
         ActionFactoryInterface $action_factory
-        )
-    {
+        ) {
         $this->turn_factory = $turn_factory;
         $this->action_factory = $action_factory;
     }
 
-    public function currentTurn(): ?Contracts\TurnInterface
+    public function currentTurn(): ?TurnInterface
     {
         if (!isset($this->turns) || empty($this->turns)) {
             return null;
@@ -58,10 +56,13 @@ class Game implements GameInterface
         return $this->turns[0];
     }
 
-    public function findPlayers($player_names): ?array
+    public function findPlayers($player_names = null): ?array
     {
         if (empty($this->players)) {
             return null;
+        }
+        if (!isset($player_names)) {
+            return $this->players;
         }
         $found = [];
         foreach ($this->players as $player) {
@@ -72,9 +73,17 @@ class Game implements GameInterface
         return $found;
     }
 
-    public function findTurn(int $index): ?Contracts\TurnInterface
+    public function findTurn(int $index): ?TurnInterface
     {
+        if (!isset($this->turns)) {
+            return null;
+        }
         return array_key_exists($index, $this->turns) ? $this->turns[$index] : null;
+    }
+
+    public function allTurns(): ?array
+    {
+        return $this->turns;
     }
 
     public function isStarted(): bool
@@ -82,7 +91,7 @@ class Game implements GameInterface
         return !empty($this->turns);
     }
 
-    public function newTurn(): ?Contracts\TurnInterface
+    public function newTurn(): ?TurnInterface
     {
         if (!($next_player = $this->nextPlayer())) {
             return null;
@@ -94,7 +103,7 @@ class Game implements GameInterface
         return $turn;
     }
 
-    public function nextPlayer(): ?Contracts\PlayerInterface
+    public function nextPlayer(): ?PlayerInterface
     {
         if (empty($this->players)) {
             return null;
@@ -107,13 +116,13 @@ class Game implements GameInterface
             $this->players[0];
     }
 
-    public function setCurrentTurn(Contracts\TurnInterface $turn): void
+    public function setCurrentTurn(TurnInterface $turn): void
     {
         if (!isset($this->turns)) {
             $this->turns[0] = $turn;
             return;
         }
-        array_prepend($this->turns, $turn);
+        $this->turns = array_merge([$turn], $this->turns);
     }
 
     public function setPlayers(array $players): void

@@ -12,7 +12,7 @@
 namespace Aesonus\TurnGame\Exceptions;
 
 /**
- * 
+ *
  * @author Aesonus <corylcomposinger at gmail.com>
  */
 class InvalidActionException extends \RuntimeException

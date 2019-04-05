@@ -2,25 +2,27 @@
 
 namespace Aesonus\Tests;
 
-use Aesonus\TurnGame\Turn;
+use Aesonus\TestLib\BaseTestCase;
 use Aesonus\TurnGame\AbstractAction;
 use Aesonus\TurnGame\Contracts\PlayerInterface;
 use Aesonus\TurnGame\Exceptions\CounterActionException;
+use Aesonus\TurnGame\Turn;
+use PHPUnit\Framework\MockObject\MockObject;
+use SplStack;
 
 /**
  * Test the base Turn class
  *
  * @author Aesonus <corylcomposinger at gmail.com>
  */
-class TurnTest extends \Aesonus\TestLib\BaseTestCase
+class TurnTest extends BaseTestCase
 {
-
     public $testObj;
     public $actionStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->actionStack = new \SplStack();
+        $this->actionStack = new SplStack();
         $this->testObj = new Turn($this->actionStack);
         parent::setUp();
     }
@@ -28,21 +30,10 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
     /**
      * @test
      */
-    public function setPlayerSetsThePlayerProperty()
+    public function playerGetsTheSetPlayer()
     {
         $expected = $this->newMockPlayer();
         $this->testObj->setPlayer($expected);
-        $actual = $this->getPropertyValue($this->testObj, 'player');
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function playerGetsThePlayerProperty()
-    {
-        $expected = $this->newMockPlayer();
-        $this->setPropertyValue($this->testObj, 'player', $expected);
         $actual = $this->testObj->player();
         $this->assertSame($expected, $actual);
     }
@@ -185,7 +176,9 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         //of itself with isResolved() returning true
         $action->expects($this->once())->method('resolve')
             ->willReturnCallback(function () use ($action) {
-                $this->setPropertyValue($action, 'resolved', true);
+                $ref = new \ReflectionProperty($action, 'resolved');
+                $ref->setAccessible(true);
+                $ref->setValue($action, true);
                 return clone $action;
             });
         $this->assertTrue($this->testObj->resolveNextAction()->isResolved());
@@ -256,7 +249,7 @@ class TurnTest extends \Aesonus\TestLib\BaseTestCase
         return $this->getMockForAbstractClass(AbstractAction::class);
     }
 
-    protected function newMockPlayer(): \PHPUnit_Framework_MockObject_MockObject
+    protected function newMockPlayer(): MockObject
     {
         return $this->getMockForAbstractClass(PlayerInterface::class);
     }

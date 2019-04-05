@@ -2,7 +2,6 @@
 
 namespace Aesonus\TurnGame\Contracts;
 
-
 /**
  *
  * @author Aesonus <corylcomposinger at gmail.com>

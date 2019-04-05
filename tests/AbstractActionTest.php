@@ -2,24 +2,29 @@
 
 namespace Aesonus\Tests;
 
-use Aesonus\TurnGame\{
-    AbstractAction,
-    Contracts\PlayerInterface
-};
+use Aesonus\TestLib\BaseTestCase;
+use Aesonus\TurnGame\AbstractAction;
+use Aesonus\TurnGame\Contracts\EffectInterface;
+use Aesonus\TurnGame\Contracts\PlayerInterface;
+use InvalidArgumentException;
+use stdClass;
 
 /**
  * Tests the Base Action class
  *
  * @author Aesonus <corylcomposinger at gmail.com>
  */
-class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
+class AbstractActionTest extends BaseTestCase
 {
 
+    /**
+     *
+     * @var AbstractAction
+     */
     protected $testObj;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-
         $this->testObj = $this->newMockAction();
         parent::setUp();
     }
@@ -33,28 +38,17 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $actual = $this->testObj
             ->setPlayer($this->newMockPlayer());
         $this->assertNotSame($expected, $actual);
+        return $actual;
     }
 
     /**
      * @test
+     * @depends setPlayerReturnsNewAction
      */
-    public function setPlayerSetsThePlayerProperty()
+    public function playerReturnsThePreviouslySetPlayer($testObj)
     {
         $expected = $this->newMockPlayer();
-        $newAction = $this->testObj->setPlayer($expected);
-        $actual = $this
-            ->getPropertyValue($newAction, 'player');
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function playerReturnsThePlayerProperty()
-    {
-        $expected = $this->newMockPlayer();
-        $this->setPropertyValue($this->testObj, 'player', $expected);
-        $actual = $this->testObj->player();
+        $actual = $testObj->player();
         $this->assertEquals($expected, $actual);
     }
 
@@ -74,50 +68,27 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         $expected = $this->testObj;
         $actual = $this->testObj->setType('test');
         $this->assertNotSame($expected, $actual);
+        return $actual;
     }
 
     /**
      * @test
-     * @dataProvider setTypeSetsTheTypePropertyDataProvider
+     * @depends setTypeReturnsNewAction
      */
-    public function setTypeSetsTheTypeProperty($expected)
-    {
-        $newAction = $this->testObj->setType($expected);
-        $actual = $this
-            ->getPropertyValue($newAction, 'type');
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Data Provider
-     */
-    public function setTypeSetsTheTypePropertyDataProvider()
-    {
-        return [
-            ['test'],
-            [new \stdClass()],
-            [23]
-        ];
-    }
-
-    /**
-     * @test
-     */
-    public function getTypeReturnsTypeProperty()
+    public function getTypeReturnsType($testObj)
     {
         $expected = 'test';
-        $this->setPropertyValue($this->testObj, 'type', $expected);
-        $actual = $this->testObj->getType();
+        $actual = $testObj->getType();
         $this->assertEquals($expected, $actual);
     }
 
     /**
      * @test
-     * @dataProvider isResolvedReturnsResolvedPropertyDataProvider
+     * @dataProvider isResolvedReturnsIfActionIsResolvedDataProvider
      */
-    public function isResolvedReturnsResolvedProperty($expected)
+    public function isResolvedReturnsIfActionIsResolved($expected)
     {
-        $this->setPropertyValue($this->testObj, 'resolved', $expected);
+        $this->testObj = $this->testObj->setIsResolved($expected);
         $actual = $this->testObj->isResolved();
         $this->assertEquals($expected, $actual);
     }
@@ -125,7 +96,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
     /**
      * Data Provider
      */
-    public function isResolvedReturnsResolvedPropertyDataProvider()
+    public function isResolvedReturnsIfActionIsResolvedDataProvider()
     {
         return [
             [true],
@@ -136,7 +107,7 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
     /**
      * @test
      */
-    public function isResolvedPropertyIsFalseByDefault()
+    public function isResolvedIsFalseByDefault()
     {
         $this->assertFalse($this->testObj->isResolved());
     }
@@ -144,12 +115,11 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
     /**
      * @test
      */
-    public function modifiesSetsTheModifiedActionProperty()
+    public function setIsResolvedReturnsNewAction()
     {
-        $expected = $this->newMockAction();
-        $newAction = $this->testObj->modifies($expected);
-        $actual = $this->getPropertyValue($newAction, 'modified_action');
-        $this->assertEquals($expected, $actual);
+        $expected = $this->testObj;
+        $actual = $this->testObj->setIsResolved(true);
+        $this->assertNotSame($expected, $actual);
     }
 
     /**
@@ -165,11 +135,11 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
     /**
      * @test
      */
-    public function getModifiedActionGetModifiedActionProperty()
+    public function getModifiedActionGetModifiedActionOnReturnedAction()
     {
         $expected = $this->newMockAction();
-        $this->setPropertyValue($this->testObj, 'modified_action', $expected);
-        $actual = $this->testObj->getModifiedAction();
+        $testObj = $this->testObj->modifies($expected);
+        $actual = $testObj->getModifiedAction();
         $this->assertEquals($expected, $actual);
     }
 
@@ -193,35 +163,11 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
 
     /**
      * @test
-     * @dataProvider targetsSetsTheTargetPropertyToArrayOfPlayersDataProvider
-     */
-    public function targetsSetsTheTargetPropertyToArrayOfPlayers($expected)
-    {
-        $newAction = $this->testObj->targets($expected);
-        //Make the expected value always an array
-        $expected = is_array($expected) ? $expected : [$expected];
-        $actual = $this->getPropertyValue($newAction, 'targets');
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Data Provider
-     */
-    public function targetsSetsTheTargetPropertyToArrayOfPlayersDataProvider()
-    {
-        return [
-            'string' => [$this->newMockPlayer()],
-            'array' => [[$this->newMockPlayer(), $this->newMockPlayer()]]
-        ];
-    }
-
-    /**
-     * @test
      * @dataProvider invalidTargetsDataProvider
      */
     public function targetsThrowsInvalidArgumentExceptionIfTargetsArentPlayers($targets)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->testObj->targets($targets);
     }
 
@@ -233,18 +179,18 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         return [
             ['not valid'],
             [['not', 'valid']],
-            [new \stdClass()],
-            [[new \stdClass()]]
+            [new stdClass()],
+            [[new stdClass()]]
         ];
     }
 
     /**
      * @test
      */
-    public function getTargetsGetsTheTargetsProperty()
+    public function getTargetsGetsTheTargetsOnNewAction()
     {
         $expected = [$this->newMockPlayer()];
-        $this->setPropertyValue($this->testObj, 'targets', $expected);
+        $this->testObj->targets($expected);
         $actual = $this->testObj->getTargets();
         $this->assertEquals($expected, $actual);
     }
@@ -262,8 +208,43 @@ class AbstractActionTest extends \Aesonus\TestLib\BaseTestCase
         return $this->getMockForAbstractClass(AbstractAction::class);
     }
 
-    protected function newMockPlayer(): \PHPUnit_Framework_MockObject_MockObject
+    protected function newMockPlayer()
     {
         return $this->getMockForAbstractClass(PlayerInterface::class);
+    }
+
+    protected function newMockEffect()
+    {
+        return $this->getMockForAbstractClass(EffectInterface::class);
+    }
+
+    /**
+     * @test
+     */
+    public function arrayAccessGetsAppendsIssetsAndUnsets()
+    {
+        $expected = $this->newMockEffect();
+
+        $this->testObj[] = $expected;
+        $this->assertEquals($expected, $this->testObj[0]);
+
+        unset($this->testObj[0]);
+        $this->assertFalse(isset($this->testObj[0]));
+    }
+
+    /**
+     * @test
+     */
+    public function iteratorAccessIteratesEffectsInOrder()
+    {
+        $expected = [
+            $this->newMockEffect(),
+            $this->newMockEffect(),
+            $this->newMockEffect(),
+        ];
+        array_map([$this->testObj, 'offsetSet'],  array_keys($expected), $expected);
+        foreach ($this->testObj as $index => $actual) {
+            $this->assertEquals($expected[$index], $actual);
+        }
     }
 }
