@@ -13,7 +13,7 @@
         "illuminate/database": "^5.6",
         "aesonus/storage": "^3.4",
         "singlequote/docblock-parser": "^1.0",
-        "aesonus/php-magic": "dev-master"
+        "aesonus/php-magic": "^0.3"
     },
     "require-dev": {
         "aesonus/test-lib": "^3.0"
