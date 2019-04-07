@@ -18,7 +18,7 @@ interface ActionInterface
      * MUST set the player taking this action (yes it can be on another player's
      * turn)
      * @param PlayerInterface $player
-     * @return ActionInterface MUST return a new ActionInterface
+     * @return ActionInterface MUST return an ActionInterface
      */
     public function setPlayer(PlayerInterface $player);
 
@@ -33,7 +33,7 @@ interface ActionInterface
      * any player or modify an action.
      * @param PlayerInterface[]|PlayerInterface $targets MUST accept a PlayerInterface
      * or an array of PlayerInterfaces.
-     * @return ActionInterface MUST return a new ActionInterface
+     * @return ActionInterface MUST return an ActionInterface
      * @throws InvalidArgumentException MUST be thrown when $targets parameter is
      * not a PlayerInterface or an array of PlayerInterfaces
      */
@@ -47,10 +47,10 @@ interface ActionInterface
 
     /**
      * MUST set which action is modified by this action.
-     * @param ActionInterface $action MUST accept an ActionInterface
-     * @return ActionInterface MUST return a new ActionInterface
+     * @param ActionInterface[]|ActionInterface $action MUST accept an ActionInterface
+     * @return ActionInterface MUST return an ActionInterface
      */
-    public function modifies(ActionInterface $action): ActionInterface;
+    public function modifies($action): ActionInterface;
 
     /**
      * MUST return the modified action or null if no action is set.
@@ -65,7 +65,7 @@ interface ActionInterface
      * @throws GameException SHOULD be thrown for game events only
      * @throws InvalidActionException MUST throw when action has no modified action
      * or target
-     * @return ActionInterface MUST return a new ActionInterface or null if the
+     * @return ActionInterface MUST return an ActionInterface or null if the
      * action is already resolved
      */
     public function resolve(): ?ActionInterface;
@@ -77,7 +77,7 @@ interface ActionInterface
     public function isResolved(): bool;
 
     /**
-     * MUST return a new ActionInterface with the new resolved state of the action
+     * MUST return an ActionInterface with the new resolved state of the action
      * @param bool $resolved
      * @return ActionInterface
      */
@@ -88,7 +88,7 @@ interface ActionInterface
      * a property on this ActionInterface to returning a different child of
      * ActionInterface altogether. SHOULD keep all information about the action.
      * @param mixed $action_type
-     * @return ActionInterface MUST return a new ActionInterface
+     * @return ActionInterface MUST return an ActionInterface
      */
     public function setType($action_type): ActionInterface;
 

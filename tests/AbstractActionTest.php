@@ -32,18 +32,18 @@ class AbstractActionTest extends BaseTestCase
     /**
      * @test
      */
-    public function setPlayerReturnsNewAction()
+    public function setPlayerReturnsAction()
     {
         $expected = $this->testObj;
         $actual = $this->testObj
             ->setPlayer($this->newMockPlayer());
-        $this->assertNotSame($expected, $actual);
+        $this->assertSame($expected, $actual);
         return $actual;
     }
 
     /**
      * @test
-     * @depends setPlayerReturnsNewAction
+     * @depends setPlayerReturnsAction
      */
     public function playerReturnsThePreviouslySetPlayer($testObj)
     {
@@ -63,17 +63,17 @@ class AbstractActionTest extends BaseTestCase
     /**
      * @test
      */
-    public function setTypeReturnsNewAction()
+    public function setTypeReturnsAction()
     {
         $expected = $this->testObj;
         $actual = $this->testObj->setType('test');
-        $this->assertNotSame($expected, $actual);
+        $this->assertSame($expected, $actual);
         return $actual;
     }
 
     /**
      * @test
-     * @depends setTypeReturnsNewAction
+     * @depends setTypeReturnsAction
      */
     public function getTypeReturnsType($testObj)
     {
@@ -115,21 +115,21 @@ class AbstractActionTest extends BaseTestCase
     /**
      * @test
      */
-    public function setIsResolvedReturnsNewAction()
+    public function setIsResolvedReturnsAction()
     {
         $expected = $this->testObj;
         $actual = $this->testObj->setIsResolved(true);
-        $this->assertNotSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /**
      * @test
      */
-    public function modifiesReturnsNewAction()
+    public function modifiesReturnsAction()
     {
         $expected = $this->testObj;
         $actual = $this->testObj->modifies($this->newMockAction());
-        $this->assertNotSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /**
@@ -154,11 +154,11 @@ class AbstractActionTest extends BaseTestCase
     /**
      * @test
      */
-    public function targetsReturnsANewAction()
+    public function targetsReturnsAAction()
     {
         $expected = $this->testObj;
         $actual = $this->testObj->targets($this->newMockPlayer());
-        $this->assertNotSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /**
@@ -187,7 +187,7 @@ class AbstractActionTest extends BaseTestCase
     /**
      * @test
      */
-    public function getTargetsGetsTheTargetsOnNewAction()
+    public function getTargetsGetsTheTargetsOnAction()
     {
         $expected = [$this->newMockPlayer()];
         $this->testObj->targets($expected);

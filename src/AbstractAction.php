@@ -22,7 +22,7 @@ abstract class AbstractAction implements ActionInterface, ArrayAccess, Iterator
      *
      * @var ActionInterface
      */
-    protected $modified_action;
+    protected $modified_actions;
 
     /**
      *
@@ -60,15 +60,15 @@ abstract class AbstractAction implements ActionInterface, ArrayAccess, Iterator
      */
     protected $current_effect = 0;
 
-    public function modifies(ActionInterface $action): ActionInterface
+    public function modifies($action): ActionInterface
     {
-        $this->modified_action = $action;
-        return clone $this;
+        $this->modified_actions = $action;
+        return $this;
     }
 
     public function getModifiedAction(): ? ActionInterface
     {
-        return $this->modified_action;
+        return $this->modified_actions;
     }
 
     public function targets($targets): ActionInterface
@@ -81,7 +81,7 @@ abstract class AbstractAction implements ActionInterface, ArrayAccess, Iterator
         }, $targets);
         $this->targets = $targets;
 
-        return clone $this;
+        return $this;
     }
 
     public function getTargets(): ?array
@@ -97,13 +97,13 @@ abstract class AbstractAction implements ActionInterface, ArrayAccess, Iterator
     public function setPlayer(PlayerInterface $player): ActionInterface
     {
         $this->player = $player;
-        return clone $this;
+        return $this;
     }
 
     public function setType($action_type): ActionInterface
     {
         $this->type = $action_type;
-        return clone $this;
+        return $this;
     }
 
     public function getType()
@@ -114,7 +114,7 @@ abstract class AbstractAction implements ActionInterface, ArrayAccess, Iterator
     public function setIsResolved(bool $resolved): ActionInterface
     {
         $this->resolved = $resolved;
-        return clone $this;
+        return $this;
     }
 
     public function isResolved(): bool

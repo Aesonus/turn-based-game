@@ -6,8 +6,10 @@ use Aesonus\TestLib\BaseTestCase;
 use Aesonus\TurnGame\AbstractAction;
 use Aesonus\TurnGame\Contracts\PlayerInterface;
 use Aesonus\TurnGame\Exceptions\CounterActionException;
+use Aesonus\TurnGame\Storage\RuntimeTurnStorage;
 use Aesonus\TurnGame\Turn;
 use PHPUnit\Framework\MockObject\MockObject;
+use ReflectionProperty;
 use SplStack;
 
 /**
@@ -19,12 +21,24 @@ class TurnTest extends BaseTestCase
 {
     public $testObj;
     public $actionStack;
+    public $turnStorage;
 
     protected function setUp(): void
     {
-        $this->actionStack = new SplStack();
-        $this->testObj = new Turn($this->actionStack);
+        $this->turnStorage = new RuntimeTurnStorage();
+        $this->actionStack = $this->turnStorage->getActionStack();
+
+        $this->testObj = new Turn($this->turnStorage);
         parent::setUp();
+    }
+
+    /**
+     * @test
+     */
+    public function allActionsReturnsSplStackInstance()
+    {
+        $actual = $this->testObj->allActions();
+        $this->assertSame($this->actionStack, $actual);
     }
 
     /**
@@ -176,7 +190,7 @@ class TurnTest extends BaseTestCase
         //of itself with isResolved() returning true
         $action->expects($this->once())->method('resolve')
             ->willReturnCallback(function () use ($action) {
-                $ref = new \ReflectionProperty($action, 'resolved');
+                $ref = new ReflectionProperty($action, 'resolved');
                 $ref->setAccessible(true);
                 $ref->setValue($action, true);
                 return clone $action;

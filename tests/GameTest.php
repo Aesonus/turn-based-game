@@ -446,7 +446,7 @@ class GameTest extends BaseTestCase
 
     protected function newTurn(PlayerInterface $player = null)
     {
-        $turn = new Turn(new SplStack());
+        $turn = new Turn(new \Aesonus\TurnGame\Storage\RuntimeTurnStorage());
         if (isset($player)) {
             $turn->setPlayer($player);
         }

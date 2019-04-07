@@ -2,9 +2,13 @@
 
 namespace Aesonus\TurnGame;
 
-use Aesonus\TurnGame\Contracts\PlayerInterface;
 use Aesonus\TurnGame\Contracts\ActionInterface;
+use Aesonus\TurnGame\Contracts\PlayerInterface;
 use Aesonus\TurnGame\Contracts\TurnInterface;
+use Aesonus\TurnGame\Storage\TurnStorageInterface;
+use OutOfRangeException;
+use RuntimeException;
+use SplStack;
 
 /**
  * Base turn class
@@ -16,47 +20,41 @@ class Turn implements TurnInterface
 
     /**
      *
-     * @var \SplStack
+     * @var TurnStorageInterface
      */
-    protected $action_stack;
+    protected $turn_storage;
 
-    /**
-     *
-     * @var PlayerInterface
-     */
-    protected $player;
-
-    public function __construct(\SplStack $action_stack)
+    public function __construct(TurnStorageInterface $turn_storage)
     {
-        $this->action_stack = $action_stack;
+        $this->turn_storage = $turn_storage;
     }
 
     public function currentAction(): ?ActionInterface
     {
         try {
-            return $this->action_stack[0];
-        } catch (\OutOfRangeException $exc) {
+            return $this->turn_storage->getActionStack()[0];
+        } catch (OutOfRangeException $exc) {
             return null;
         }
     }
 
     public function player(): ?PlayerInterface
     {
-        return $this->player;
+        return $this->turn_storage->getCurrentPlayer();
     }
 
     public function popAction(): ?ActionInterface
     {
         try {
-            return $this->action_stack->pop();
-        } catch (\RuntimeException $exc) {
+            return $this->turn_storage->getActionStack()->pop();
+        } catch (RuntimeException $exc) {
             return null;
         }
     }
 
     public function pushAction(ActionInterface $action): void
     {
-        $this->action_stack->push($action);
+        $this->turn_storage->getActionStack()->push($action);
     }
 
     public function resolveNextAction(): ?ActionInterface
@@ -71,6 +69,11 @@ class Turn implements TurnInterface
 
     public function setPlayer(PlayerInterface $player): void
     {
-        $this->player = $player;
+        $this->turn_storage->setCurrentPlayer($player);
+    }
+
+    public function allActions()
+    {
+        return $this->turn_storage->getActionStack();
     }
 }
