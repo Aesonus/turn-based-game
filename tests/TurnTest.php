@@ -26,7 +26,7 @@ class TurnTest extends BaseTestCase
     protected function setUp(): void
     {
         $this->turnStorage = new RuntimeTurnStorage();
-        $this->actionStack = $this->turnStorage->getActionStack();
+        $this->actionStack = $this->turnStorage->__getActionStack();
 
         $this->testObj = new Turn($this->turnStorage);
         parent::setUp();

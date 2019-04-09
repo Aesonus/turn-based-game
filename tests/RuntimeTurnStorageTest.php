@@ -24,7 +24,7 @@ class RuntimeTurnStorageTest extends BaseTestCase
      */
     public function setTurnIdReturnsFalseIfTurnIdDoesNotExist()
     {
-        $actual = $this->testObj->setTurnId(0);
+        $actual = $this->testObj->loadRecord(0);
         $this->assertFalse($actual);
     }
 
@@ -32,19 +32,19 @@ class RuntimeTurnStorageTest extends BaseTestCase
      * @test
      * @dataProvider getActionStackDataProvider
      */
-    public function getActionStackReturnsActionStackForSetTurnId($turns, $expected_id)
+    public function getActionStackReturnsActionStackForRecordId($turns, $expected_id)
     {
         //Create some turns
         foreach ($turns as $turn) {
             $storage = $this->testObj->newInstance();
             foreach ($turn as $method => $attr) {
 
-                call_user_func([$storage, 'set' . $method], $attr);
+                call_user_func([$storage, '__set' . $method], $attr);
             }
-            $storage->saveTurn();
+            $storage->save();
         }
-        $this->testObj->setTurnId($expected_id);
-        $actual = $this->testObj->getActionStack();
+        $this->testObj->loadRecord($expected_id);
+        $actual = $this->testObj->__getActionStack();
         $expected = $turns[$expected_id]['ActionStack'];
         $this->assertSame($expected, $actual);
     }
@@ -76,19 +76,19 @@ class RuntimeTurnStorageTest extends BaseTestCase
      * @test
      * @dataProvider getCurrentPlayerDataProvider
      */
-    public function getCurrentPlayerReturnsActionStackForSetTurnId($turns, $expected_id)
+    public function getCurrentPlayerReturnsActionStackForRecordId($turns, $expected_id)
     {
         //Create some turns
         foreach ($turns as $turn) {
             $storage = $this->testObj->newInstance();
             foreach ($turn as $method => $attr) {
 
-                call_user_func([$storage, 'set' . $method], $attr);
+                call_user_func([$storage, '__set' . $method], $attr);
             }
-            $storage->saveTurn();
+            $storage->save();
         }
-        $this->testObj->setTurnId($expected_id);
-        $actual = $this->testObj->getCurrentPlayer();
+        $this->testObj->loadRecord($expected_id);
+        $actual = $this->testObj->__getCurrentPlayer();
         $expected = $turns[$expected_id]['CurrentPlayer'];
         $this->assertSame($expected, $actual);
     }
@@ -126,10 +126,10 @@ class RuntimeTurnStorageTest extends BaseTestCase
     /**
      * @test
      */
-    public function saveTurnReturnsTheTurnId()
+    public function saveReturnsTheTurnId()
     {
         $expected = 0;
-        $actual = $this->testObj->saveTurn();
+        $actual = $this->testObj->save();
         $this->assertEquals($expected, $actual);
     }
 }

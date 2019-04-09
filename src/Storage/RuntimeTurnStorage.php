@@ -2,6 +2,8 @@
 
 namespace Aesonus\TurnGame\Storage;
 
+use Aesonus\PhpMagic\HasInheritedMagicProperties;
+use Aesonus\PhpMagic\ImplementsMagicMethods;
 use Aesonus\TurnGame\Contracts\PlayerInterface;
 use SplStack;
 
@@ -12,6 +14,8 @@ use SplStack;
  */
 class RuntimeTurnStorage implements TurnStorageInterface
 {
+    use HasInheritedMagicProperties;
+    use ImplementsMagicMethods;
     /**
      *
      * @var SplStack
@@ -42,32 +46,32 @@ class RuntimeTurnStorage implements TurnStorageInterface
      */
     protected $id;
 
-    public function getActionStack(): SplStack
+    public function __getActionStack(): SplStack
     {
         if (!isset($this->action_stack)) {
-            $this->setActionStack(new \SplStack);
+            $this->__setActionStack(new \SplStack);
         }
         return $this->action_stack;
     }
 
-    public function getCurrentPlayer(): ?PlayerInterface
+    public function __getCurrentPlayer(): ?PlayerInterface
     {
         return $this->current_player;
     }
 
-    public function setActionStack($action_stack): bool
+    public function __setActionStack($action_stack): bool
     {
         $this->action_stack = $action_stack;
         return true;
     }
 
-    public function setCurrentPlayer(PlayerInterface $player): bool
+    public function __setCurrentPlayer(PlayerInterface $player): bool
     {
         $this->current_player = $player;
         return true;
     }
 
-    public function saveTurn(): ?int
+    public function save(): ?int
     {
         if (!$this->id) {
             //Create new record in static variable
@@ -78,7 +82,7 @@ class RuntimeTurnStorage implements TurnStorageInterface
         return $this->id;
     }
 
-    public function setTurnId(int $id): bool
+    public function loadRecord($id): bool
     {
         if (!key_exists($id, static::$action_stacks)) {
             return false;

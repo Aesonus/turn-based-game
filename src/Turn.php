@@ -32,7 +32,7 @@ class Turn implements TurnInterface
     public function currentAction(): ?ActionInterface
     {
         try {
-            return $this->turn_storage->getActionStack()[0];
+            return $this->turn_storage->action_stack[0];
         } catch (OutOfRangeException $exc) {
             return null;
         }
@@ -40,13 +40,13 @@ class Turn implements TurnInterface
 
     public function player(): ?PlayerInterface
     {
-        return $this->turn_storage->getCurrentPlayer();
+        return $this->turn_storage->current_player;
     }
 
     public function popAction(): ?ActionInterface
     {
         try {
-            return $this->turn_storage->getActionStack()->pop();
+            return $this->turn_storage->action_stack->pop();
         } catch (RuntimeException $exc) {
             return null;
         }
@@ -54,7 +54,7 @@ class Turn implements TurnInterface
 
     public function pushAction(ActionInterface $action): void
     {
-        $this->turn_storage->getActionStack()->push($action);
+        $this->turn_storage->action_stack->push($action);
     }
 
     public function resolveNextAction(): ?ActionInterface
@@ -69,11 +69,11 @@ class Turn implements TurnInterface
 
     public function setPlayer(PlayerInterface $player): void
     {
-        $this->turn_storage->setCurrentPlayer($player);
+        $this->turn_storage->current_player = $player;
     }
 
     public function allActions()
     {
-        return $this->turn_storage->getActionStack();
+        return $this->turn_storage->action_stack;
     }
 }
