@@ -14,7 +14,7 @@ use Throwable;
 abstract class InputRequiredException extends GameException
 {
 
-    public function __construct(PlayerInterface $player, string $message = "", int $code = 0, Throwable $previous = NULL): Exception
+    public function __construct(PlayerInterface $player, string $message = "", int $code = 0, Throwable $previous = NULL)
     {
 
         $this->setPlayer($player);
