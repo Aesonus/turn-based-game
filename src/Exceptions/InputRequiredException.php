@@ -16,7 +16,6 @@ abstract class InputRequiredException extends GameException
 
     public function __construct(PlayerInterface $player, string $message = "", int $code = 0, Throwable $previous = NULL)
     {
-
         $this->setPlayer($player);
         return parent::__construct($message, $code, $previous);
     }
