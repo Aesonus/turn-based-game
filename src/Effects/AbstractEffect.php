@@ -26,6 +26,12 @@ abstract class AbstractEffect implements EffectInterface
      */
     protected $source;
 
+    /**
+     *
+     * @var int
+     */
+    protected $amount;
+
     public function setSource(PlayerInterface $player): void
     {
         $this->source = $player;
@@ -36,8 +42,36 @@ abstract class AbstractEffect implements EffectInterface
         return $this->source;
     }
 
-    public static function newEffect(?array $constructor_args = null): AbstractEffect
+    public static function newEffect(array $constructor_args = []): EffectInterface
     {
-        return new self;
+        return new static(...$constructor_args);
+    }
+
+    public function jsonSerialize(): string
+    {
+        return json_encode($this->getAllAttributes());
+    }
+
+    /**
+     * Override this if you need to add more attributes to the array
+     * @return array
+     */
+    protected function getAllAttributes(): array
+    {
+        $attributes = [
+            'class' => get_class($this),
+            'source' => $this->source()->name(),
+            'amount' => $this->amount,
+        ];
+        return $attributes;
+    }
+
+    public static function newEffectFromJson(string $json): EffectInterface
+    {
+        $attributes = json_decode($json);
+        $new = new $attributes->class;
+        $new->source = $attributes->source;
+        $new->amount = $attributes->amount;
+        return $new;
     }
 }
