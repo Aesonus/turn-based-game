@@ -2,8 +2,11 @@
 
 namespace Aesonus\TurnGame;
 
+use Aesonus\PhpMagic\HasInheritedMagicProperties;
 use Aesonus\TurnGame\Contracts\ActionFactoryInterface;
+use Aesonus\TurnGame\Contracts\ActionInterface;
 use Aesonus\TurnGame\Contracts\PlayerInterface;
+use Aesonus\TurnGame\Storage\PlayerStorageInterface;
 
 /**
  * Base class for players in a turn based game
@@ -15,7 +18,7 @@ use Aesonus\TurnGame\Contracts\PlayerInterface;
  */
 abstract class AbstractPlayer implements PlayerInterface
 {
-    use \Aesonus\PhpMagic\HasMagicProperties;
+    use HasInheritedMagicProperties;
     const NO_NAME = '__NA__';
 
     /**
@@ -36,9 +39,19 @@ abstract class AbstractPlayer implements PlayerInterface
      */
     protected $actionFactory;
 
-    public function __construct(ActionFactoryInterface $actionFactory)
-    {
+    /**
+     *
+     * @var PlayerStorageInterface
+     */
+    protected $storage;
+
+    public function __construct(
+        ActionFactoryInterface $actionFactory,
+        PlayerStorageInterface $storage,
+        $id = null
+    ) {
         $this->actionFactory = $actionFactory;
+        $this->storage = $storage->newInstance()->loadRecord($id);
     }
 
     public function initiative(): ?float
@@ -66,19 +79,24 @@ abstract class AbstractPlayer implements PlayerInterface
         return $this->name() ?? static::NO_NAME;
     }
 
+    public function newAction(): ActionInterface
+    {
+        return $this->actionFactory->newAction()->setPlayer($this);
+    }
+
     public function __get($name)
     {
         return $this->magicGet($name);
     }
 
-    protected function __getInitiative()
-    {
-        return $this->initiative();
-    }
-
     public function __isset($name)
     {
         return $this->magicIsset($name);
+    }
+
+    protected function __getInitiative()
+    {
+        return $this->initiative();
     }
 
     protected function __issetInitiative()

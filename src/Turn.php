@@ -24,7 +24,7 @@ class Turn implements TurnInterface
      */
     protected $turn_storage;
 
-    public function __construct(TurnStorageInterface $turn_storage)
+    public function __construct(TurnStorageInterface $turn_storage, $id = null)
     {
         $this->turn_storage = $turn_storage;
     }
@@ -54,7 +54,7 @@ class Turn implements TurnInterface
 
     public function pushAction(ActionInterface $action): void
     {
-        $this->turn_storage->action_stack->push($action);
+        $this->turn_storage->getActionStack()->push($action);
     }
 
     public function resolveNextAction(): ?ActionInterface
@@ -69,11 +69,11 @@ class Turn implements TurnInterface
 
     public function setPlayer(PlayerInterface $player): void
     {
-        $this->turn_storage->current_player = $player;
+        $this->turn_storage->setCurrentPlayer($player);
     }
 
     public function allActions()
     {
-        return $this->turn_storage->action_stack;
+        return $this->turn_storage->getActionStack();
     }
 }

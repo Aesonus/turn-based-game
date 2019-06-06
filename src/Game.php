@@ -98,8 +98,7 @@ class Game implements GameInterface
         }
         $turn = $this->turn_factory->newTurn();
         $turn->setPlayer($next_player);
-        $turn->pushAction($this->action_factory
-            ->newAction()->setPlayer($next_player));
+        $turn->pushAction($next_player->newAction());
         return $turn;
     }
 
